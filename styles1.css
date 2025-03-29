@@ -1,0 +1,210 @@
+/* Vertical container */
+.vertical-container {
+    display: flex;
+    flex-direction: column;    /* Stack boxes vertically */
+    gap: 60px;                 /* Adds space between the boxes */
+    width: 80%;
+   /*  max-width: 600px;          Optional: Set a max width for the container */
+    margin: 0 auto;            /* Optional: Center the container */
+    content: center;
+}
+
+/* Individual box elements inside the vertical container */
+.box {
+    padding: 20px;
+    border: 1px solid #09ff555b;
+    border-radius: 10px;
+     
+    background-color: #09ff5703;
+    text-align: center;         /* Center text inside the box */
+
+}
+.box-contact {
+    padding: 20px;
+    border: 1px solid #bc6c25;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #bc6c25;
+    background-color: #bc6b2505;
+    text-align: center;         /* Center text inside the box */
+
+}
+.box-other {
+    padding: 20px;
+    border: 1px solid #ff099d5b;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #ff099d14;
+    background-color: #ff099d5b;
+    text-align: center;         /* Center text inside the box */
+
+}
+.box-project {
+    padding: 20px;
+    border: 1px solid #15ff00;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    background-color: #15ff00;
+    text-align: center;         /* Center text inside the box */
+
+}
+.box-education {
+    padding: 20px;
+    border: 1px solid #d609ff5b;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #d609ff63;
+    background-color: #d609ff0c;
+    text-align: center;         /* Center text inside the box */
+
+}
+.project-color{
+    text-shadow: 
+    -1px -1px 2px black, 
+    1px -1px 2px black, 
+    -1px 1px 2px black, 
+    1px 1px 2px black; 
+    color :#15ff00
+    
+}
+.contact-color{
+    
+    text-shadow: 
+    -1px -1px 2px black, 
+    1px -1px 2px black, 
+    -1px 1px 2px black, 
+    1px 1px 2px black; 
+    color :#bc6c25
+    
+}
+.education-color{
+    text-shadow: 
+    -1px -1px 2px black, 
+    1px -1px 2px black, 
+    -1px 1px 2px black, 
+    1px 1px 2px black; 
+    color :#d609ff63
+}
+.vertical-box-container {
+   
+    display: flex;
+    flex-direction: column; 
+    margin: 0 auto;            /* Optional: Center the container */
+    content: center;
+    gap: 80px;  
+    padding: 20px;
+    
+    border: 5px solid #0000005b;
+    border-radius: 10px;
+   /*  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);*/
+   
+    text-align: center;         /* Center text inside the box */
+
+    padding: 20px;
+    border: 1px solid #09ff555b;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #09ff571d;
+    background-color: #111211;
+    text-align: center;   
+}
+.vertical-box-container2 {
+   
+    display: flex;
+    flex-direction: column; 
+    margin: 0 auto;            /* Optional: Center the container */
+    content: center;
+    gap: 80px;  
+    padding: 20px;
+    
+    border: 5px solid #0000005b;
+    border-radius: 10px;
+   /*  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);*/
+   
+    text-align: center;         /* Center text inside the box */
+
+    padding: 20px;
+    border: 1px solid #ff099d5b;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #ff099d5b;
+    background-color: #111211;
+    text-align: center;   
+}
+h3 {
+    padding-bottom: 30px;
+}
+
+/* Horizontal container inside each box */
+.horizontal-container {
+    display: flex;
+    justify-content: space-between;   /* Space out the inner boxes */
+    gap: 10px;                        /* Adds space between the inner boxes */
+    margin-bottom: 10px;              /* Adds space below the horizontal container */
+}
+
+/* Horizontal inner boxes */
+.inner-box {
+    padding: 10px;
+    
+    background-color: #000000;
+    text-align: center;     /* Center text inside each horizontal box */
+    width: 45%;             /* Each box takes up 45% of the horizontal container */
+
+
+    padding: 20px;
+    border: 1px solid #0000005b;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+   
+}
+.inner-box-left  {
+    padding: 10px;
+    border: 1px solid #999;
+    background-color: #000000;
+    text-align: left;     /* Center text inside each horizontal box */
+    width: 45%;             /* Each box takes up 45% of the horizontal container */
+}
+.text-left{
+    text-align: left; 
+}
+/* Video box */
+.video-box {
+    display: flex;           /* Ensures the video is handled correctly */
+    justify-content: center; /* Center the video inside the box */
+}
+
+/* Video styling */
+.video {
+    width: 100%;             /* Make video fill the box */
+    height: auto;            /* Maintain the aspect ratio */
+    max-width: 100%;         /* Prevent video from overflowing */
+    display: block;          /* Remove extra space below the video */
+    max-height: 600px;
+}
+
+/* Styling for the list inside content box */
+ul {
+    /*  text-align: left;       Align text to the left */
+    list-style-type: none;   /* Remove default list bullets */
+    padding: 0;
+}
+.li-header  {
+    text-align: center;        /* Align text to the left */
+    list-style-type: none;   /* Remove default list bullets */
+    padding: 0;
+}
+header {
+    position: sticky;
+  top: 0;
+  z-index: 1000; /* Ensure the header stays on top of other content */
+  background-color: #fff; /* Optional: Set a background color for the header */
+  
+    background-color: #181C14;
+    color: #697565;
+    padding: 5px 0;
+    align-content: center;
+    
+}
+li {
+    margin-bottom: 10px;     /* Adds space between list items */
+}
+
+strong {
+    color: #ffffff;             /* Make labels bold and dark for better readability */
+}
