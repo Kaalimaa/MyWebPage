@@ -1,0 +1,433 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #181C14;
+    color: white;
+    text-align: center;
+}
+body.t {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #181C14;
+    color: white;
+    text-align: left;
+}
+header {
+    position: sticky;
+  top: 0;
+  z-index: 1000; /* Ensure the header stays on top of other content */
+  background-color: #fff; /* Optional: Set a background color for the header */
+ 
+    background-color: #181C14;
+    color: #697565;
+    padding: 5px 0;
+    align-content: center;
+    
+}
+ /* 
+  ---------      sTART work      -----
+
+*/
+
+@media (min-width: 901px) {
+    .work__image-box {
+        flex: 1;
+        margin: 0 0 0 10rem;
+    }
+}
+.work__list {
+    list-style-type: square;
+    list-style-position: outside;
+    margin-bottom: var(--gutter-normal);
+    padding-left: 20px;
+}
+.work__box:not(:last-child) {
+    margin-bottom: 25rem;
+}
+.work__box {
+    display: flex;
+    align-items: center;
+}
+.work__text {
+    flex: 0 0 30%;
+}
+
+@media (min-width: 901px) {
+    .work__image-box {
+        flex: 1;
+        margin: 0 0 0 10rem;
+    }
+}
+.work__image-box {
+    margin-bottom: var(--gutter-normal);
+}
+.work__links {
+    display: flex;
+    align-items: center;
+}
+ /* 
+  ---------      END work      -----
+
+*/
+ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+    unicode-bidi: isolate;
+    align-items: left;
+}
+.ul-header {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+    unicode-bidi: isolate;
+    align-items: center;
+}
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+    unicode-bidi: isolate;
+    align-items: left;
+}
+::marker {
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+    text-transform: none;
+    text-indent: 0px !important;
+    text-align: start !important;
+    text-align-last: auto !important;
+}
+[type=button], [type=reset], [type=submit], button {
+    -webkit-appearance: button;
+}
+button, select {
+    text-transform: none;
+}
+button, input {
+    overflow: visible;
+}
+button, input, optgroup, select, textarea {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+}
+
+button {
+    appearance: auto; 
+    text-rendering: auto;
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: center;
+    cursor: default;
+    box-sizing: border-box;
+    background-color: Blue;
+    margin: 0em;
+    padding-block: 1px;
+    padding-inline: 6px;
+    border-width: 2px;
+    border-style: outset;
+    border-color: buttonborder;
+    border-image: initial;
+}
+.card {
+    border: none;
+    text-align: left;
+    color: #fff;
+    display: inline-block;
+    background-color: #1e1e1e;
+    padding: 24px;
+    border-radius: 4px;
+    font-size: 1rem;
+    margin: 8px 0;
+    width: 100%;
+    min-height: 100%;
+    line-height: 1.44;
+}
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+p2{
+    color: #697565;
+}
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    
+}
+.experience {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 0 32px;
+}
+section {
+    
+    padding: 20px;
+    margin: 20px;
+    background: #222;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    width: 80%;
+    max-width: 8000px;
+    flex: auto;
+    align-content: center;
+}
+.go-top{
+}
+.point1{
+    padding: 20px;
+    margin: 20px;
+    background: #222;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    width: 80%;
+    max-width: 8000px;
+    flex: auto;
+    }
+
+section2 {
+    padding: 20px;
+    margin: 20px;
+    background: #002708;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    width: 80%;
+    max-width: 8000px;
+    flex: auto;
+}
+.video-grid {
+    background: #afafaf;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 items per row */
+    gap: 20px;
+    padding: 20px;
+    width: 100%; /* Takes full width of section */
+    max-width: 100%; /* Ensures it doesn't overflow */
+    background-size: cover;
+    background-position: center;
+    box-sizing: border-box; /* Ensures padding is included */
+    overflow: hidden; 
+}
+.video-grid1 {
+    background: #afafaf;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-gap: 20px;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    max-width: 1200px;
+    margin: auto;
+    background-size: cover;
+    background-position: center;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+    flex: auto;
+}
+.grid-item {
+   
+    width: 100%;
+    
+    background-image: url('nanobotGameSuccess.mp4');
+    background-size: cover;
+    background-position: center;
+    flex: auto;
+}
+.grid-item2 {
+   
+    width: 100%;
+    
+    background-image: url('nanobotGameSuccess.mp4');
+    background-size: cover;
+    background-position: center;
+    flex: auto;
+}
+.video-item {
+
+    width: 100%; /* Full width of the grid item */
+    height: 100%; /* Full height of the grid item */
+    background-image: url('DigAndFly.gif'); /* Background image */
+    background-size: cover; /* Ensure the image covers the whole element */
+    background-position: center; /* Center the image */
+    padding: 40px; /* Padding inside the item */
+    margin: 0px; /* Margin around the item */
+    background: #000000; /* Fallback background color */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); /* Box shadow */
+    max-width: 100%; /* Allow the item to take full width */
+    box-sizing: border-box; /* Include padding and margin in width calculation */
+    border-radius: 10px; 
+
+    box-sizing: border-box; /* Ensures padding is included */
+    overflow: hidden; 
+   
+}
+.video-item-link {
+    width: 100%; /* Fit inside grid */
+    height: 100%; /* Fit inside grid */
+   
+    background-size: cover;
+    background-position: center;
+    background-color: #000000;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden; /* Prevents internal content from escaping */
+    background-size: 100% 100% ;
+    
+}
+
+/* Ensure text, images, and all content inside does not overflow */
+.video-grid *, .video-item-link * {
+    max-width: 100%;
+    max-height: 100%;
+    white-space: nowrap; /* Prevents text from breaking out */
+    text-overflow: ellipsis; /* Truncate long text */
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+
+
+.video-item-link:hover {
+
+box-shadow: 0 0 10px rgba(0, 27, 4, 0.5); 
+border-color: blue;
+}
+
+
+.video-item2  {
+   
+    height: 10%; /* Full height of the grid item */
+    background-image: url('DigAndFly.gif'); /* Background image */
+    background-size: cover; /* Ensure the image covers the whole element */
+    background-position: center; /* Center the image */
+    padding: 40px; /* Padding inside the item */
+    margin: 0px; /* Margin around the item */
+    background: #000000; /* Fallback background color */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); /* Box shadow */
+    max-width: 100%; /* Allow the item to take full width */
+    box-sizing: border-box; /* Include padding and margin in width calculation */
+}
+
+/* Styling for the .video-grid container */
+.video-grid {
+    background: #00000000; 
+    display: grid; /* Use grid layout */
+    grid-template-columns: repeat(2, 1fr); /* Two columns, equal width */
+    grid-gap: 20px; /* Space between grid items */
+    padding: 20px; /* Padding around the grid */
+    width: 100%; /* Full width of the container */
+    max-width: 1200px; /* Maximum width of the container */
+    margin: auto; /* Center the grid */
+    background-size: cover; /* Make background cover the grid */
+    background-position: center; /* Center the background image */
+    box-sizing: border-box; /* Include padding and margin in width calculation */
+}
+.video-item2 {
+   
+    width: 100%;
+    height: 400px;
+    background-image: url("nanobotGameSuccess.mp4");
+    background-size: cover;
+    background-position: center;
+
+}
+.video-item3 {
+   
+    width: 100%;
+    height: 400px;
+    background-image: url('DigAndFly.gif');
+    background-size: cover;
+    background-position: center;
+
+}
+
+.video-item video {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.video-item p {
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    margin-top: 20px;
+}
+
+#map {
+    height: 400px; 
+}
+#weather-codes {
+    margin-top: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+.gif-style {
+    
+    width: 100%;
+    height: 400px;
+  background-image: url('DigAndFly.gif'); 
+    background-size: cover;
+    background-position: center;
+  }
