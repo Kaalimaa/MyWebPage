@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+   
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauli Hanell</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+    <go-top id="home">
+        
+    </go-top>
+    <h1>Sauli Hanell's website</h1>
+    <header>
+        <!--<img src="your-animation.gif" alt="Looping GIF" class="gif-style">-->
+        <nav>
+            <ul>
+                
+                <li><a href="index.html"><h1> ⬅️ Return Home</h1></a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="vertical-container">
+        <box id="weather">
+            <h2>Weather </h2>
+            
+            <p id="weather-info">Loading weather information...</p>
+           
+            </div>
+        </box>
+    </div class="vertical-container">
+        
+        <script>
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(fetchLocation, showError);
+            } else {
+                document.getElementById('weather').innerText = 'Geolocation is not supported by this browser.';
+            }
+    
+            function fetchLocation(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+    
+                // Reverse geocoding API (gets city & country)
+                const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+    
+                fetch(geoUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const city = data.address.city || data.address.town || data.address.village || "Unknown Location";
+                        const country = data.address.country || "Unknown Country";
+                        fetchWeather(lat, lon, city, country);
+                    })
+                    .catch(error => {
+                        console.error("Geolocation fetch failed:", error);
+                        fetchWeather(lat, lon, "Unknown Location", "Unknown Country");
+                    });
+            }
+    
+            function fetchWeather(lat, lon, city, country) {
+                // Open-Meteo API (weather data)
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+    
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        const weather = data.current_weather;
+                        const weatherHTML = `
+                            <h3>Weather in ${city}, ${country}</h3>
+                            <strong>Latitude:</strong> ${lat.toFixed(2)}<br>
+                            <strong>Longitude:</strong> ${lon.toFixed(2)}<br>
+                            <strong>Temperature:</strong> ${weather.temperature}°C<br>
+                            <strong>Wind Speed:</strong> ${weather.windspeed} km/h<br>
+                            <strong>Condition:</strong> ${WeatherCodesInText(weather.weathercode)}
+                        `;
+                        document.getElementById('weather').innerHTML = weatherHTML;
+                    })
+                    .catch(error => {
+                        document.getElementById('weather').innerText = 'Unable to fetch weather data.';
+                        console.error(error);
+                    });
+            }
+    
+            function showError(error) {
+                let message = '';
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        
+                        message = 'You denied the request for Geolocation. No weather to You :( ';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message = 'Location information is unavailable.';
+                        break;
+                    case error.TIMEOUT:
+                        message = 'The request to get user location timed out.';
+                        break;
+                    default:
+                        message = 'An unknown error occurred.';
+                }
+                document.getElementById('weather').innerText = message;
+            }
+    
+            function WeatherCodesInText(code) {
+                switch (code) {
+                    case 0: return 'Clear sky';
+                    case 1: return 'Mainly clear';
+                    case 2: return 'Partly cloudy';
+                    case 3: return 'Overcast';
+                    case 45: return 'Fog';
+                    case 48: return 'Depositing rime fog';
+                    case 51: return 'Light drizzle';
+                    case 53: return 'Moderate drizzle';
+                    case 55: return 'Dense drizzle';
+                    case 61: return 'Slight rain';
+                    case 63: return 'Moderate rain';
+                    case 65: return 'Heavy rain';
+                    case 71: return 'Slight snowfall';
+                    case 73: return 'Moderate snowfall';
+                    case 75: return 'Heavy snowfall';
+                    case 95: return 'Thunderstorm';
+                    default: return 'Unknown weather condition';
+                }
+            }
+        </script>
+     
+     <footer>
+         <p>&copy; 2025 Sauli Hanell. All rights reserved.</p>
+     </footer>
+</body>
+</html>
