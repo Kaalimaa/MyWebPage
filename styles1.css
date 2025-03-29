@@ -63,6 +63,14 @@
     1px 1px 2px black; 
     color :#15ff00
     
+}.other-color{
+    text-shadow: 
+    -1px -1px 2px black, 
+    1px -1px 2px black, 
+    -1px 1px 2px black, 
+    1px 1px 2px black; 
+    color :#ff0098
+    
 }
 .contact-color{
     
