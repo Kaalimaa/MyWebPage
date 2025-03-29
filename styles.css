@@ -408,11 +408,11 @@ nav ul li a {
     font-size: 16px;
     cursor: pointer;
     border-radius: 8px;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.23s ease-in-out;
  
 
     background-color: #002a6a3c; /* Vibrant Blue */
-    border-color: #23006a00; /* Darker blue for border */
+    border-color: #23006a; /* Darker blue for border */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for hover */
     box-shadow: 0 4px 8px rgba(255, 0, 0, 0);
    
@@ -423,22 +423,21 @@ nav ul li a {
 
 .custom-button:hover {
     
-    background-color: #092302; /* Deep Blue-Grey */
-    color: white;
+   
     border: 2px solid #3c5e34; /* Slightly lighter blue-grey border */
-    box-shadow: 0 0 8px 2px rgba(0, 255, 0, 0.7);
+    
 
 
     background-color: #080020; /* Vibrant Blue */
     border-color: #23006a; /* Darker blue for border */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for hover */
-    box-shadow: 0 4px 8px rgba(255, 0, 0, 0);
+    box-shadow: 0 4px 8px rgba(0, 26, 255, 0.349); /* Soft shadow for hover */
+    box-shadow: 0 4px 8px rgb(0, 38, 255);
 }
 
 
 
 .custom-button:active {
-    background-color: #00ac14; /* Darker Blue when clicked */
+    background-color: #0644ff; /* Darker Blue when clicked */
     border-color: #000000; /* Darker blue border when clicked */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); /* Light shadow for active state */
 }
