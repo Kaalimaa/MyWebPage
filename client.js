@@ -1,4 +1,4 @@
-const socket = io("https://webpage-ro95.onrender.com"); 
+const socket = io("https://webpage-1-h5bj.onrender.com"); 
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
