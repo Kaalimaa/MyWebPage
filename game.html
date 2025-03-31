@@ -1,34 +1,145 @@
-<!DOCTYPE html>
-<html lang="fi">
+<!DOCTYPE html> 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moninpeli</title>
+    <title>WebGameTest</title>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles1.css">
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        #gameArea {
+            width: 400px;
+            height: 500px;
+            background-color: lightblue;
+            position: relative;
+            margin: auto;
+            overflow: hidden;
+            border: 2px solid black;
+        }
+        #player {
+            width: 40px;
+            height: 40px;
+            background-color: green;
+            position: absolute;
+            bottom: 10px;
+            left: 180px;
+        }
+        .bomb {
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            position: absolute;
+            top: 0;
+        }
+        /* Control buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .btn {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            background-color: gray;
+            color: white;
+            border: none;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .btn:active {
+            background-color: darkgray;
+        }
+    </style>
 </head>
 <body>
+
     <header>
         <!--<img src="your-animation.gif" alt="Looping GIF" class="gif-style">-->
         <nav>
             <ul>
-
-                <li><a href="index.html"><h1> <button class="custom-button">⬅️ Return Home</button></h1></a></li>
-                
+                <li><a href="index.html"><h1><button class="custom-button">⬅️ Return Home</button></h1></a></li>
             </ul>
         </nav>
     </header>
-    <h1>Yksinkertainen moninpeli Testi</h1>
+
+    <h1>Dodge the bombs! Move with arrow keys or touchscreen.</h1>
+    <div id="gameArea">
+        <div id="player"></div>
+    </div>
+
+    <!-- Touchscreen controls -->
+    <div class="controls">
+        <button class="btn" id="left">⬅️</button>
+        <button class="btn" id="right">➡️</button>
+    </div>
+
+    <script>
+        let player = document.getElementById("player");
+        let gameArea = document.getElementById("gameArea");
+        let speed = 20;
+        let gameRunning = true;
+
+        function movePlayer(direction) {
+            let x = player.offsetLeft;
+            if (direction === "left" && x > 0) x -= speed;
+            if (direction === "right" && x < 360) x += speed;
+            player.style.left = x + "px";
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "ArrowLeft") movePlayer("left");
+            if (event.key === "ArrowRight") movePlayer("right");
+        });
+
+        document.getElementById("left").addEventListener("click", function() {
+            movePlayer("left");
+        });
+
+        document.getElementById("right").addEventListener("click", function() {
+            movePlayer("right");
+        });
+
+        function createBomb() {
+            if (!gameRunning) return;
+
+            let bomb = document.createElement("div");
+            bomb.classList.add("bomb");
+            bomb.style.left = Math.floor(Math.random() * 370) + "px";
+            gameArea.appendChild(bomb);
+
+            let bombMovement = setInterval(function() {
+                if (!gameRunning) {
+                    clearInterval(bombMovement);
+                    return;
+                }
+
+                let y = bomb.offsetTop;
+                bomb.style.top = (y + 5) + "px";
+
+                // Check collision with player
+                if (y > 460 && Math.abs(player.offsetLeft - bomb.offsetLeft) < 30) {
+                    alert("Game Over!");
+                    gameRunning = false;
+                    location.reload();
+                }
+
+                if (y > 500) {
+                    clearInterval(bombMovement);
+                    bomb.remove();
+                }
+            }, 50);
+        }
+
+        setInterval(createBomb, 1000);
+    </script>
+
+    <h1>Multiplayer Test</h1>
     <canvas id="gameCanvas"></canvas>
 
     <script src="client.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
