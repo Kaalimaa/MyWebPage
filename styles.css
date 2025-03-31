@@ -3,9 +3,14 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #181C14;
+    background-color: #0E0E0F;
     color: white;
     text-align: center;
+}
+/*Game*/
+canvas {
+    border: 1px solid white;
+    background-color: grey;
 }
 body.t {
     font-family: Arial, sans-serif;
@@ -108,44 +113,7 @@ li {
     text-align: start !important;
     text-align-last: auto !important;
 }
-[type=button], [type=reset], [type=submit], button {
-    -webkit-appearance: button;
-}
-button, select {
-    text-transform: none;
-}
-button, input {
-    overflow: visible;
-}
-button, input, optgroup, select, textarea {
-    font-family: inherit;
-    font-size: 100%;
-    line-height: 1.15;
-    margin: 0;
-}
 
-button {
-    appearance: auto; 
-    text-rendering: auto;
-    letter-spacing: normal;
-    word-spacing: normal;
-    line-height: normal;
-    text-transform: none;
-    text-indent: 0px;
-    text-shadow: none;
-    display: inline-block;
-    text-align: center;
-    cursor: default;
-    box-sizing: border-box;
-    background-color: Blue;
-    margin: 0em;
-    padding-block: 1px;
-    padding-inline: 6px;
-    border-width: 2px;
-    border-style: outset;
-    border-color: buttonborder;
-    border-image: initial;
-}
 .card {
     border: none;
     text-align: left;
@@ -160,20 +128,7 @@ button {
     min-height: 100%;
     line-height: 1.44;
 }
-nav ul {
-    list-style: none;
-    padding: 0;
-}
 
-nav ul li {
-    display: inline;
-    margin: 0 15px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-}
 p2{
     color: #697565;
 }
@@ -427,7 +382,71 @@ th {
     
     width: 100%;
     height: 400px;
-  background-image: url('DigAndFly.gif'); 
+  background-image: url('fishU.gif'); 
     background-size: cover;
     background-position: center;
   }
+  /* Basic styling for the navigation links */
+nav ul {
+    list-style: none;
+    padding: 0;
+    background-color: #000000;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+    background-color: #000000;
+}
+
+nav ul li a {
+    background-color: #000000;
+    color: rgb(255, 0, 0);
+    text-decoration: none;
+}
+.custom-button {
+    font-family: Arial, sans-serif;
+    background-color: #190223; /* Deep Blue-Grey */
+    color: white;
+    border: 2px solid #5e3457; /* Slightly lighter blue-grey border */
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.23s ease-in-out;
+ 
+
+    background-color: #002a6a3c; /* Vibrant Blue */
+    border-color: #23006a; /* Darker blue for border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for hover */
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0);
+   
+
+
+    outline: none;
+}
+
+.custom-button:hover {
+    
+   
+    border: 2px solid #3c5e34; /* Slightly lighter blue-grey border */
+    
+
+
+    background-color: #080020; /* Vibrant Blue */
+    border-color: #23006a; /* Darker blue for border */
+    box-shadow: 0 4px 8px rgba(0, 26, 255, 0.349); /* Soft shadow for hover */
+    box-shadow: 0 4px 8px rgb(0, 38, 255);
+}
+
+
+
+.custom-button:active {
+    background-color: #0644ff; /* Darker Blue when clicked */
+    border-color: #000000; /* Darker blue border when clicked */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); /* Light shadow for active state */
+}
+
+
+
+
