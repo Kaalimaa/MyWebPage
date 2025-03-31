@@ -1,4 +1,4 @@
-const socket = io("https://moninpeliserver.onrender.com"); // Vaihda tämä Renderin URL:ksi!
+const socket = io("https://webpage-ro95.onrender.com"); 
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -6,39 +6,43 @@ const ctx = canvas.getContext("2d");
 canvas.width = 600;
 canvas.height = 400;
 
-let players = {};
+let players = {}; // Kaikki pelaajat tallennetaan tähän
+let myId = null;  // Oma ID tallennetaan tähän
 
-// Päivitä pelaajat palvelimelta
+// Kun palvelin kertoo nykyiset pelaajat
 socket.on("currentPlayers", (serverPlayers) => {
     players = serverPlayers;
 });
 
+// Kun uusi pelaaja liittyy
 socket.on("newPlayer", (data) => {
     players[data.id] = data.pos;
 });
 
+// Kun pelaajien sijaintia päivitetään
 socket.on("updatePlayers", (serverPlayers) => {
     players = serverPlayers;
 });
 
+// Kun joku poistuu pelistä
 socket.on("removePlayer", (id) => {
     delete players[id];
 });
 
-// Piirrä peli
+// Piirretään peli
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let id in players) {
         let player = players[id];
-        ctx.fillStyle = "white";
+        ctx.fillStyle = (id === socket.id) ? "blue" : "red"; // Oma hahmo on sininen, muut punaisia
         ctx.fillRect(player.x, player.y, 20, 20);
     }
 
     requestAnimationFrame(draw);
 }
 
-// Lähetä pelaajan liikkeet
+// Pelaajan liikkuminen
 document.addEventListener("keydown", (event) => {
     const speed = 5;
     let myPlayer = players[socket.id] || { x: 300, y: 200 };
