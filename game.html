@@ -26,7 +26,7 @@
             background-size: cover; /* or contain, depending on your needs */
             background-repeat: no-repeat;
             position: absolute;
-            bottom: 10px;
+            bottom: 0px;
             left: 180px;
         }
         .explosion {
@@ -163,7 +163,7 @@
         bomb.style.top = (y + 5) + "px";
 
         // Collision with player
-        if (y > 460 && Math.abs(player.offsetLeft - bomb.offsetLeft) < 30) {
+        if (y > 465 && Math.abs(player.offsetLeft - bomb.offsetLeft) < 30) {
             clearInterval(bombMovement);
             gameRunning = false;
             bomb.style.backgroundImage = 'url("BarrelExposion.png")';
@@ -188,7 +188,7 @@
         }
 
         // If bomb hits the ground
-        if (y > 460) {
+        if (y > 465) {
             clearInterval(bombMovement);
             bomb.style.backgroundImage = 'url("BarrelExposion.png")';
             try {
