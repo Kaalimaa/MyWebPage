@@ -29,6 +29,17 @@
             bottom: 10px;
             left: 180px;
         }
+        .explosion {
+            width: 30px;
+            height: 30px;
+            
+            background-image: url("BarrelExposion.png");
+            background-size: cover; /* or contain, depending on your needs */
+            background-repeat: no-repeat;
+
+            position: absolute;
+           
+        }
         .bomb {
             width: 30px;
             height: 30px;
@@ -60,6 +71,19 @@
         .btn:active {
             background-color: rgb(27, 160, 0);
         }
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 24px;
+            padding: 20px 40px;
+            border-radius: 10px;
+            display: none; /* piilotettu aluksi */
+            z-index: 1000;
+        }   
     </style>
 </head>
 <body>
@@ -91,7 +115,16 @@
         let gameArea = document.getElementById("gameArea");
         let speed = 20;
         let gameRunning = true;
+        function showMessage(text, duration = 1500) {
+            const messageBox = document.getElementById("message");
+            messageBox.textContent = text;
+            messageBox.style.display = "block";
 
+             setTimeout(() => 
+            {
+            messageBox.style.display = "none";
+            }, duration);
+        }
         function movePlayer(direction) {
             let x = player.offsetLeft;
             if (direction === "left" && x > 0) x -= speed;
@@ -111,39 +144,72 @@
         document.getElementById("right").addEventListener("click", function() {
             movePlayer("right");
         });
-
+    
         function createBomb() {
-            if (!gameRunning) return;
+    if (!gameRunning) return;
 
-            let bomb = document.createElement("div");
-            bomb.classList.add("bomb");
-            bomb.style.left = Math.floor(Math.random() * 370) + "px";
-            gameArea.appendChild(bomb);
+    let bomb = document.createElement("div");
+    bomb.classList.add("bomb");
+    bomb.style.left = Math.floor(Math.random() * 370) + "px";
+    gameArea.appendChild(bomb);
 
-            let bombMovement = setInterval(function() {
-                if (!gameRunning) {
-                    clearInterval(bombMovement);
-                    return;
-                }
-
-                let y = bomb.offsetTop;
-                bomb.style.top = (y + 5) + "px";
-
-                // Check collision with player
-                if (y > 460 && Math.abs(player.offsetLeft - bomb.offsetLeft) < 30) {
-                    alert("Game Over!");
-                    gameRunning = false;
-                    location.reload();
-                }
-
-                if (y > 500) {
-                    clearInterval(bombMovement);
-                    bomb.remove();
-                    score++;
-                    document.getElementById("score").textContent = score;
-                }
-            }, 50);
+    let bombMovement = setInterval(function () {
+        if (!gameRunning) {
+            clearInterval(bombMovement);
+            return;
         }
+
+        let y = bomb.offsetTop;
+        bomb.style.top = (y + 5) + "px";
+
+        // Collision with player
+        if (y > 460 && Math.abs(player.offsetLeft - bomb.offsetLeft) < 30) {
+            clearInterval(bombMovement);
+            gameRunning = false;
+            bomb.style.backgroundImage = 'url("BarrelExposion.png")';
+
+            // Try/catch for missing function
+            try {
+                createExplosion();
+            } catch (e) {
+                console.warn("Explosion function missing:", e);
+            }
+           
+            // Remove bomb after 1 second
+            setTimeout(() => {
+                alert("Game Over! Score: "+score);
+                bomb.remove();
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            }, 1000);
+
+             
+        }
+
+        // If bomb hits the ground
+        if (y > 460) {
+            clearInterval(bombMovement);
+            bomb.style.backgroundImage = 'url("BarrelExposion.png")';
+            try {
+                createExplosion();
+            } catch (e) {
+                console.warn("Explosion function missing:", e);
+            }
+
+            setTimeout(() => {
+                bomb.remove();
+            }, 1000);
+            //alert("score:"+score);
+         
+            score++;
+            document.getElementById("score").textContent = score;
+        }
+    }, 50);
+
+
+}
+
 
         setInterval(createBomb, 1000);
     </script>
