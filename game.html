@@ -7,6 +7,7 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles1.css">
+    
     <style>
         body { text-align: center; font-family: Arial, sans-serif; }
         #gameArea {
@@ -49,15 +50,15 @@
             width: 60px;
             height: 60px;
             font-size: 24px;
-            background-color: gray;
-            color: white;
+            background-color: rgb(128, 128, 128);
+            color: rgb(255, 0, 0);
             border: none;
             margin: 5px;
             border-radius: 10px;
             cursor: pointer;
         }
         .btn:active {
-            background-color: darkgray;
+            background-color: rgb(27, 160, 0);
         }
     </style>
 </head>
@@ -74,6 +75,7 @@
 
     <h1>Dodge the bombs! Move with arrow keys.</h1>
     <div id="gameArea">
+        <h2>Score: <span id="score">0</span></h2>
         <div id="player"></div>
     </div>
 
@@ -84,6 +86,7 @@
     </div>
 
     <script>
+        let score = 0; 
         let player = document.getElementById("player");
         let gameArea = document.getElementById("gameArea");
         let speed = 20;
@@ -136,6 +139,8 @@
                 if (y > 500) {
                     clearInterval(bombMovement);
                     bomb.remove();
+                    score++;
+                    document.getElementById("score").textContent = score;
                 }
             }, 50);
         }
