@@ -84,6 +84,16 @@
             display: none; /* piilotettu aluksi */
             z-index: 1000;
         }   
+        .coin 
+        {
+            width: 20px;
+            height: 20px;
+            background-image: url("coin2.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: absolute;
+            bottom: 0px;
+        }
     </style>
 </head>
 <body>
@@ -151,7 +161,37 @@
         document.getElementById("right").addEventListener("click", function() {
             movePlayer("right");
         });
-    
+        
+        function spawnCoin(x, y) 
+        {
+            let coin = document.createElement("div");
+            coin.classList.add("coin");
+            coin.style.left = x + "px";
+            
+            gameArea.appendChild(coin);
+
+            // Coin pickup check loop
+            let coinCheck = setInterval(() => 
+            {
+                let px = player.offsetLeft;
+                let py = player.offsetTop;
+
+                let cx = coin.offsetLeft;
+                let cy = coin.offsetTop;
+
+                if (
+                    Math.abs(px - cx) < 30 &&
+                    Math.abs(py - cy) < 30
+                ) {
+                    score += 10;
+                    document.getElementById("score").textContent = score;
+                    coin.remove();
+                    clearInterval(coinCheck);
+                }
+            }, 100);
+        }
+
+
         function createBomb() {
     if (!gameRunning) return;
 
@@ -173,10 +213,10 @@
         if (y > 465 && Math.abs(player.offsetLeft - bomb.offsetLeft) < 30) {
             clearInterval(bombMovement);
             gameRunning = false;
-            bomb.style.backgroundImage = 'url("BarrelExposion.png")';
-
+            
             // Try/catch for missing function
             try {
+                bomb.style.backgroundImage = 'url("BarrelExposion.png")';
                 createExplosion();
             } catch (e) {
                 console.warn("Explosion function missing:", e);
@@ -197,18 +237,20 @@
         // If bomb hits the ground
         if (y > 465) {
             clearInterval(bombMovement);
-            bomb.style.backgroundImage = 'url("BarrelExposion.png")';
+
             try {
+                bomb.style.backgroundImage = 'url("BarrelExposion.png")';
                 createExplosion();
             } catch (e) {
                 console.warn("Explosion function missing:", e);
             }
-
+            
             setTimeout(() => {
+                spawnCoin(bomb.offsetLeft, 465);
                 bomb.remove();
             }, 100);
             //alert("score:"+score);
-         
+            
             score++;
             document.getElementById("score").textContent = score;
         }
