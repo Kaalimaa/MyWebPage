@@ -125,10 +125,17 @@
             messageBox.style.display = "none";
             }, duration);
         }
-        function movePlayer(direction) {
+        function movePlayer(direction) 
+        {
             let x = player.offsetLeft;
-            if (direction === "left" && x > 0) x -= speed;
-            if (direction === "right" && x < 360) x += speed;
+            if (direction === "left" && x > 0) {
+                x -= speed;
+                player.style.transform = "scaleX(-1)"; // käännä sprite vasemmalle
+            }
+            if (direction === "right" && x < 360) {
+                x += speed;
+                player.style.transform = "scaleX(1)"; // käännä sprite oikealle
+            }
             player.style.left = x + "px";
         }
 
