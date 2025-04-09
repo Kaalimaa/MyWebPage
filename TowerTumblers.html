@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+   
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauli Hanell</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+    <go-top id="home">
+        
+    </go-top>
+    <h1>Tower Tumblers</h1>
+    <header>
+        <!--<img src="your-animation.gif" alt="Looping GIF" class="gif-style">-->
+        <nav>
+            <ul>
+                
+                <li><a href="index.html"><h1> <button class="custom-button">⬅️ Return Home</button></h1></a></li>
+            </ul>
+        </nav>
+    </header>
+  
+    <div class="box">
+                
+        <h3>character logic and interactions</h3>
+        <div class="horizontal-container">
+            <div class="inner-box">
+                <div class="text-left">
+                   
+                   
+                    <strong>ABOUT:</strong>   
+                    <p>...
+                       </p>
+                   
+                
+                    
+                <pre><code class="language-csharp">
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+//Author: Sauli Hanell -- Edited: 24.3.2023, 29.3.2023, 6.4.2023, 4.5.2023, 5.5.2023
+/// <summary>
+/// Players Ragdoll movement and inputs
+/// </summary>
+public class RagdollController2 : MonoBehaviour
+{
+    //Player Inputs
+    float _xDir;
+    public bool moveLeft = false, moveRight = false, crouchKeyPressed = false, _isStand = true, isGrounded = false, gripR, gripL, useRHand = true, useLHand = true;
+
+    [Header("Movement")]
+    [SerializeField] float maxHorizontalVelocity = 9;
+    CustomInputActions input = null;
+    Vector2 _moveInputValue;
+    public float movementForce;
+    public float jumpForce;
+    bool canJump = false, moveHands = true;
+    [Space(5)]
+    [Range(0f, 100f)] public float raycastDistance = 1.5f;
+    public LayerMask groundLayer;
+
+    [Header("Hands")]
+    [SerializeField] float armRotationSpeed = 300;
+    [SerializeField] GameObject _shoulderR, _shoulderL, _armR, _armL;
+    public Hands _shoulderR_Script, _shoulderL_Script, _armR_Script, _armL_Script;
+    public GameObject _RHandPos, _LHandPos;
+    Hands _RHand, _LHand;
+    Rigidbody2D _shoulderR_Rigidbody, _shoulderL_Rigidbody, _armR_Rigidbody, _armL_Rigidbody;
+    public Vector2 controllerStickInputValue;
+
+    [Header("Body parts balance move force")]
+    [SerializeField] float _NormalBalanceForce = 200, _CrouchBalanceForce =10;
+
+    [Header("Camera follow")]
+    public Camera cam;
+    [Range(0f, 100f)] public float interpolation = 0.1f;
+    public Vector3 offset = new Vector3(0f, 2f, -10f);
+
+    [Header("Animation")]
+    [SerializeField] Animator anim;
+    [SerializeField] Rigidbody2D _rb2;
+
+    //reference to all ragdoll balance scripts
+    Balance[] balanceScriptsList;
+    Balance balance_LegLUpper;
+    Balance balance_LegLLower;
+    Balance balance_LegRLower;
+    Balance balance_LegRUpper;
+    public bool isStun;
+
+    [Header("Head Collision")]
+    public static float HeadStunVelocity = 8;
+    float _startTime;
+    float _InStunTime = 2;
+    private bool _stunApplyed;
+    public Vector2 LJoystickVector;
+    public float LJoystick_Angle;
+    public bool isHatChange, isTorsoChange, isHatChangeReverse, isTorsoChangeReverse, isYButton;
+
+
+    [SerializeField] Transform hammerHandle, lowEnd, FarEnd, hammerTarget;
+    [SerializeField] Rigidbody2D hammerRB;
+
+    float t, leftTriggerValue;
+    [SerializeField] float hammerPushAndpullSpeed =5, raylength=1;
+    [SerializeField]  SliderJoint2D slider;
+
+ [SerializeField] Vector2 HammerDir =new Vector2(-1.02999997f, -383.5f);
+    private void Awake()
+    {
+        _shoulderR_Rigidbody = _shoulderR.GetComponent<Rigidbody2D>();
+        _shoulderL_Rigidbody = _shoulderL.GetComponent<Rigidbody2D>();
+        _armR_Rigidbody = _armR.GetComponent<Rigidbody2D>();
+        _armL_Rigidbody = _armL.GetComponent<Rigidbody2D>();
+        input = new CustomInputActions();
+      
+        //_shoulderL.GetComponent<>
+    }
+    public void OnHatChangePerformed(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.HatChange.name)
+        {
+            if (context.performed)
+            {
+                Debug.Log(" isHatChange = true;");
+                isHatChange = true;
+        
+            }
+        }
+    }
+    public void OnHatChangeCanceled(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.HatChange.name)
+        {
+            if (context.canceled)
+            {
+
+                Debug.Log(" isHatChange = False;");
+                isHatChange = false;
+            }
+        }
+    }
+
+
+    public void OnHatChangeReversePerformed(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.HatReverse.name)
+        {
+            if (context.performed)
+            {
+                Debug.Log(" isHatChange = true;");
+                isHatChangeReverse = true;
+
+            }
+        }
+    }
+    public void YButtonPerformed(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.YButton.name)
+        {
+            if (context.performed)
+            {
+                print("Y button true");
+               isYButton = true;
+
+            }
+        }
+    }
+    public void YButtonCanceled(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.YButton.name)
+        {
+            if (context.canceled)
+            {
+                print("Y button false");
+                isYButton = false;
+
+            }
+        }
+    }
+    public void OnHatChangeReverseCanceled(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.HatReverse.name)
+        {
+            if (context.canceled)
+            {
+                Debug.Log(" isHatChange = true;");
+                isHatChangeReverse = false;
+
+            }
+        }
+    }
+    public void OnTorsoChangePerformed(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.TorsoChange.name)
+        {
+            if (context.performed)
+            {
+                Debug.Log(" isTorsoChange = true;");
+                isTorsoChange = true;
+            }  
+        }
+    }
+    public void OnTorsoChangeCanceled(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.TorsoChange.name)
+        {
+
+            if (context.canceled)
+            {
+                Debug.Log(" isTorsoChange = False;");
+                isTorsoChange = false;
+            }
+        }
+    }
+    public void OnTorsoChangeReversePerformed(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.TorsoReverse.name)
+        {
+            if (context.performed)
+            {
+                Debug.Log(" isTorsoChange = true;");
+                isTorsoChangeReverse = true;
+            }
+        }
+    }
+    public void OnTorsoChangeReverseCanceled(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.TorsoReverse.name)
+        {
+
+            if (context.canceled)
+            {
+                Debug.Log(" isTorsoChange = False;");
+                isTorsoChangeReverse = false;
+            }
+        }
+    }
+
+    public void OnHandsMovementPerformed(InputAction.CallbackContext context)
+    {
+        if(context.action.name == input.Player.Hands_movement.name)
+        {
+
+            if (context.performed)
+            {
+                // context.ReadValue<Vector2>() * 2).magnitude
+                controllerStickInputValue = context.ReadValue<Vector2>() * 2;
+                LJoystickVector = context.ReadValue<Vector2>();
+               
+            }
+        }
+
+
+    }
+    public void LTriggerPerformed(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.LTrigger.name)
+        {
+
+            //if (context.performed)
+            //{
+            //    leftTriggerValue = context.ReadValue<float>();
+              
+
+            //}
+        }
+        leftTriggerValue = context.ReadValue<float>();
+
+    }
+    public void LTriggerCanseled(InputAction.CallbackContext context)
+    {
+        if (context.action.name == input.Player.LTrigger.name)
+        {
+
+            if (context.canceled)
+            {
+                leftTriggerValue=0;
+                
+
+            }
+        }
+
+
+    }
+
+    public void OnHandsMovementCancelled(InputAction.CallbackContext obj)
+    {
+
+    }
+    public void OnLeftHandPerformed(InputAction.CallbackContext context)
+    {
+
+        if (context.performed)
+        {
+            if (useLHand)
+            {
+                useLHand = false;
+
+            }
+            else
+                useLHand = true;
+
+
+        }
+    }
+    public void OnLeftHandCancelled(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            useRHand = false;
+        }
+    }
+    public void OnRightHandPerformed(InputAction.CallbackContext context)
+    {
+
+        if (context.performed)
+        {
+            if (useRHand)
+            {
+                useRHand = false;
+
+            }
+            else
+                useRHand = true;
+
+
+        }                                   
+       
+    }
+    public void OnRightHandCancelled(InputAction.CallbackContext context)
+    {
+        //useRHand = false;
+    }
+
+    public void OnMovementPerformed(InputAction.CallbackContext value)
+    {
+        if (value.action.name == input.Player.Movement.name)
+        {
+            //Debug.Log("MOVEMENT VECTOR2 value:" + value);
+            _moveInputValue = new Vector2(value.ReadValue<Vector2>().x * 2, value.ReadValue<Vector2>().y * 2);
+
+
+            // _rb2.AddForce(Vector2.right * movementForce * _moveInputValue.x * Time.deltaTime, ForceMode2D.Impulse);
+        }
+    }
+    public void OnMovementCancelled(InputAction.CallbackContext value)
+    {
+        if (value.action.name == input.Player.Movement.name)
+        {
+            _moveInputValue = new Vector2(value.ReadValue<Vector2>().x * 2, value.ReadValue<Vector2>().y * 2);
+            //if (value.canceled)
+            //{
+            //_moveInputValue = Vector2.zero;
+            //    if (_rb2.velocity.x >= maxHorizontalVelocity || _rb2.velocity.x <= -maxHorizontalVelocity)
+            //    {
+            //        _rb2.velocity = new Vector2(Mathf.Clamp(_rb2.velocity.x, 0, maxHorizontalVelocity), _rb2.velocity.y);
+            //    }
+            //}
+        }
+    }
+    public void OnCrouchPerformed(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+
+            crouchKeyPressed = true;
+            _isStand = false;
+        }
+
+      
+    }
+    public void OnCrouchCancelled(InputAction.CallbackContext context)
+    {
+        if (context.canceled)
+        {
+            crouchKeyPressed = false;
+
+        }
+
+
+    }
+  
+    void Start()
+    {
+        //if(TryGetComponent<Rigidbody2D>(out Rigidbody2D rig2D))
+        //{
+        //    _rb2 = rig2D;
+        //}
+        //Gets all childs in ragdoll
+        balanceScriptsList = GetComponentsInChildren<Balance>();
+
+        //setting legs to its own variable
+        foreach (Balance balanceScript in balanceScriptsList)
+        {
+            if (balanceScript.gameObject.name == "LeftLeg")
+            {
+                balance_LegLUpper = balanceScript;
+
+            }
+            if (balanceScript.gameObject.name == "RightLeg")
+            {
+                balance_LegRUpper = balanceScript;
+
+            }
+            if (balanceScript.gameObject.name == "LeftLeg2")
+            {
+                balance_LegLLower = balanceScript;
+
+            }
+            if (balanceScript.gameObject.name == "RightLeg2")
+            {
+                balance_LegRLower = balanceScript;
+
+            }
+        }
+        SetMoveRotationForceToAllBodyParts(_NormalBalanceForce);
+
+    }
+    void SetMoveRotationForceToAllBodyParts(float forceAmount)
+    {
+        foreach (Balance balanceScript in balanceScriptsList)
+        {
+            if (balanceScript != null)
+            {
+                balanceScript.force = forceAmount;
+
+            }
+        }
+
+    }
+    void StunRelease()
+    {
+        isStun = false;
+        _stunApplyed = false;
+        SetMoveRotationForceToAllBodyParts(_NormalBalanceForce);
+        moveHands = true;
+    }
+    private void Update()
+    {
+
+
+        PlayerInput();
+        if (isStun && !_stunApplyed)
+        {
+            _stunApplyed = true;
+            moveHands = false;
+            SetMoveRotationForceToAllBodyParts(0);
+            Invoke("StunRelease", _InStunTime);
+        }
+       
+        var v = Vector2.ClampMagnitude(LJoystickVector.normalized, Vector2.Distance(lowEnd.position, FarEnd.position));
+            t = leftTriggerValue;
+      
+        hammerHandle.position = Vector2.Lerp( FarEnd.position,lowEnd.position, t);
+    
+
+    }
+
+    private void PlayerInput()
+    {
+        //Move key check
+        _xDir = _moveInputValue.x;
+        if (_xDir > 0)
+        {
+            moveRight = true;
+        }
+        else if (_xDir < 0)
+        {
+            moveLeft = true;
+        }
+        else
+        {
+            moveRight = false;
+            moveLeft = false;
+        }
+
+
+        //Animation
+        if (anim != null && _rb2 != null)
+        {
+            if (crouchKeyPressed)
+            {
+                anim.Play("Crouch");
+                print("PLAY CROUCH!!!!!!!!!!!!");
+              
+                    _isStand = false;
+             
+               
+                SetMoveRotationForce(balance_LegLUpper, _CrouchBalanceForce);
+                SetMoveRotationForce(balance_LegRUpper, _CrouchBalanceForce);
+            }
+            else if (_moveInputValue.x > 0)
+            {
+                anim.Play("WalkR");
+            }
+            else if (_moveInputValue.x < 0)
+            {
+                anim.Play("WalkL1");
+            }
+            else anim.Play("Idle_ragdoll");
+        }
+        else Debug.Log("Fix this --> Anim or Rb is null");
+
+    }
+  
+    private void FixedUpdate()
+    {
+        
+        //Horizontal movement force
+        if (_moveInputValue.x != 0)
+        {
+            _rb2.AddForce(Vector2.right * movementForce * _moveInputValue.x * Time.deltaTime, ForceMode2D.Impulse);
+
+        }
+        if (hammerRB != null)
+        {// hammerHandle.position = Vector2.Lerp(lowEnd.position, FarEnd.position, t);
+            hammerRB.rotation = _shoulderL_Rigidbody.rotation- 40;
+
+            // Mathf.InverseLerp(0, max,  Vector2.Distance(hammerTarget.position, hammerRB.position));
+            if (Vector2.Distance(hammerTarget.position, hammerRB.position) > 0.1)
+            {
+                
+               // hammerRB.velocity = (((Vector2)hammerTarget.position - hammerRB.position).normalized  * hammerPushAndpullSpeed) * Vector2.Distance(_shoulderL_Rigidbody.transform.position, (Vector3)hammerRB.position);
+            }
+            else
+            {
+             //   hammerRB.velocity = Vector2.zero;
+          
+            }
+
+            //hammerRB.AddForce(((Vector2)_shoulderL_Rigidbody.transform.position - hammerRB.position).normalized  * Vector2.Distance(_shoulderL_Rigidbody.transform.position ,(Vector3)hammerRB.position));
+        }
+
+        if (moveHands && armRotationSpeed!=0 && !isStun)
+        {
+            float zRotation = Mathf.Atan2(controllerStickInputValue.y, controllerStickInputValue.x) * Mathf.Rad2Deg;
+            zRotation = Mathf.Atan2(LJoystickVector.y, LJoystickVector.x) * Mathf.Rad2Deg;
+            //if (_shoulderL_Rigidbody != null)
+            {
+            //_shoulderL_Rigidbody.MoveRotation(Mathf.LerpAngle(_shoulderL_Rigidbody.rotation, zRotation + 130, armRotationSpeed * Time.deltaTime));
+            //_armL_Rigidbody.MoveRotation(Mathf.LerpAngle(_armL_Rigidbody.rotation, zRotation + 130, armRotationSpeed * Time.deltaTime));
+            }
+
+            if (_shoulderR_Rigidbody != null)
+            {
+                _shoulderR_Rigidbody.MoveRotation(Mathf.LerpAngle(_shoulderR_Rigidbody.rotation, zRotation + 100, armRotationSpeed * Time.deltaTime));
+                _armR_Rigidbody.MoveRotation(Mathf.LerpAngle(_armR_Rigidbody.rotation, zRotation + 100, armRotationSpeed * Time.deltaTime));
+            }
+        }
+
+        //if (LJoystickVector.magnitude > 1)
+        //{
+        //    hammerRB.AddForce(LJoystickVector + hammerRB.position);
+        //}
+
+        if (crouchKeyPressed)
+        {
+           // Crouch();
+        }
+        else StandUp();
+
+
+        if (cam != null)
+        {
+            CameraFollow();
+        }
+       
+        if(_moveInputValue.x == 0 && _rb2!= null)
+        {
+
+
+            _rb2.velocity = new Vector2(Mathf.Clamp(_rb2.velocity.x, 0, 2), _rb2.velocity.y);
+        }
+
+        //if(IsGounded())
+        //{
+        // Jump();
+        //}
+    }
+
+    private void StandUp()
+    {
+        int multiply = 0;
+        //  stand sets legs moveRotation force to 750
+        if (!_isStand && !isStun )
+        {
+            if (balance_LegLUpper != null)
+            {
+
+                SetMoveRotationForce(balance_LegLUpper, _NormalBalanceForce);
+                multiply += 1;
+
+
+            }
+
+            if (balance_LegRUpper != null)
+            {
+                SetMoveRotationForce(balance_LegRUpper, _NormalBalanceForce);
+                multiply += 1;
+
+            }
+            if (GroundCheck())
+                AddJumpForce(multiply);
+            _isStand = true;
+        }
+    }
+
+    
+    private void Crouch()
+    {
+        // sets legs moveRotation force to 0
+
+        if (balance_LegLUpper != null)
+        {
+            //balance_LegLUpper.force = 0;
+            _isStand = false;
+        }
+
+        if (balance_LegRUpper != null)
+        {
+            //balance_LegRUpper.force = 0;
+          
+            _isStand = false;
+        }
+
+
+    }
+
+
+    /// <summary>
+    /// Set body part rotation force amount
+    /// </summary>
+    /// <param name="bodyPart"></param>
+    /// <param name="amount"></param>
+    private void SetMoveRotationForce(Balance bodyPart, float amount )
+    {
+        Debug.Log("REST ANGLE is:" + bodyPart.restingAngle);
+        bodyPart.force = amount;
+        //bodyPart.restingAngle = restAngle;
+    }
+    private void AddJumpForce(int multiply)
+    {
+        _rb2.AddForce(Vector2.up * jumpForce * multiply * Time.deltaTime);
+    }
+    private bool GroundCheck()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(_rb2.transform.position, Vector2.down, raycastDistance, groundLayer);
+        Debug.DrawRay(_rb2.transform.position, Vector2.down * raycastDistance, Color.red);
+
+        if (hit.collider != null)
+        {
+            return true;
+
+        }
+        else return false;
+    }
+    private void CameraFollow()
+    {
+        cam.transform.position = Vector3.Lerp(cam.transform.position, _rb2.transform.position + offset, interpolation);
+    }
+    private void OnDrawGizmos()
+    {
+        if (_shoulderL_Rigidbody !=null)
+        {
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere((Vector3)_shoulderL_Rigidbody.transform.position, 0.1f);
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawSphere(controllerStickInputValue + _shoulderL_Rigidbody.position, 0.1f);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(_shoulderL_Rigidbody.position+LJoystickVector, .2f);
+
+        Debug.DrawRay(_rb2.transform.position, Vector2.down * raycastDistance, Color.red);
+
+           
+        }
+    }
+
+}
+
+                </code> </pre>
+                </div>
+            </div>
+
+
+           
+
+            
+               
+               
+           
+            <div class="inner-box video-box">
+                <video class="video" controls autoplay loop muted playsinline>
+                    <source src="TowerTumblers.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+               
+            
+            </div>
+        </div>
+    <!-- Object logic and movement -->
+    <div class="box">
+                
+        <h3>Hammer</h3>
+        <div class="horizontal-container">
+            <div class="inner-box">
+                <div class="text-left">
+                   
+          
+                    
+                <pre><code class="language-csharp">
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+//Author: Sauli Hanell -- Edited:26.4.2023
+public class HammerVelocity : MonoBehaviour
+{
+    //[SerializeField] Transform hammerTarget;
+    Rigidbody2D rb;
+    [SerializeField] float _magnitude;
+    [SerializeField] float _Angle, angleVelocity;
+    [SerializeField] Vector3 dir;
+    [SerializeField] float _maxSpeed = 10, _speed = 2, _inputMultiply = 1.45f, inputDirValue, _maxDistancePivotToHammerHandle, distanceHammerToInputlocation;
+    [SerializeField] RagdollController2 controller;
+    [SerializeField] Transform pivot;
+    float wantedAngle, inputAngle, currentAngle, zRotDirection;
+    bool applyStopForce = false;
+    Vector2 _dirHammerToInputLocation, inputDirClamped, inputDirNormalized, controllerStickInput;
+    [SerializeField] TestHammer testHammer;
+
+     Vector2 fixedDir = new Vector2(-0.75999999f, -1f);
+
+    
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+   
+    void Update()
+    {
+        controllerStickInput = controller.LJoystickVector;
+        angleVelocity = rb.angularVelocity;
+        _magnitude = rb.velocity.magnitude;
+
+    }
+    public float angle_diff(float from, float to)
+    {
+
+
+        float result = to % 360 - from % 360;
+
+        if (result > 180)
+        {
+            //Debug.Log("result > 180 ->" + result);
+            result -= 360;
+            //Debug.Log("result =-360 ->" + result);
+        }
+
+        if (result <= -180)
+        {
+            result += 360;
+        }
+        return result;
+
+
+    }
+    private void FixedUpdate()
+    {
+        if (!controller.isStun)
+        {
+
+            wantedAngle = Vector2.SignedAngle(transform.rotation * fixedDir, controller.LJoystickVector);
+            float scale = -1 + (0.00555555555555555555555555555556f) * (wantedAngle + 180);
+ 
+
+            if (wantedAngle != 0)
+            {
+                
+                rb.AddTorque(scale * _speed);  
+            }
+            else
+            {
+                rb.angularVelocity = 0;
+               
+            }
+
+     
+        }
+
+        rb.rotation = rb.rotation % 360;
+
+
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(transform.position, transform.position + (transform.up * 3));
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3)(transform.rotation * fixedDir.normalized * 3));
+    }
+}
+                </code> </pre>
+
+                </div>
+            </div>
+
+
+           
+
+            
+               
+               
+           
+            <div class="inner-box video-box">
+                <video class="video" controls autoplay loop muted playsinline>
+                    <source src="TowerTumblers.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+               
+            
+            </div>
+        </div>
+    </div>
+     
+    
+     <footer>
+         <p>&copy; 2025 Sauli Hanell. All rights reserved.</p>
+     </footer>
+</body>
+</html>

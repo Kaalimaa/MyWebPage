@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+   
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauli Hanell</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+    <go-top id="home">
+        
+    </go-top>
+    <h1>CHYBERLANCE</h1>
+    <header>
+        <!--<img src="your-animation.gif" alt="Looping GIF" class="gif-style">-->
+        <nav>
+            <ul>
+                
+                <li><a href="index.html"><h1> <button class="custom-button">⬅️ Return Home</button></h1></a></li>
+            </ul>
+        </nav>
+    </header>
+  
+    <div class="box">
+                
+        <h3>nanobot minigame logic</h3>
+        <div class="horizontal-container">
+            <div class="inner-box">
+                <div class="text-left">
+                   
+                   
+                    <strong>ABOUT:</strong>   
+                    <p>Nanobots move inside a rectangle and randomly flash their lights to indicate what they are.
+                        In the beginning, I had the idea that corrupted bots could destroy the good ones, making it easier for the player to lose the game.
+                        However, since the other game didn't have a lose condition, I decided to leave that feature out.
+                       </p>
+                   
+                
+                    
+                <pre><code class="language-csharp">
+    //nanobot minigame logic
+    using System;
+using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
+
+//Author: Sauli Hanell
+public class FindBadNanoBots : MonoBehaviour, IWindow
+{
+    [SerializeField] UnityEngine.UI.Image[] windowImageBounds;
+    UnityEngine.UI.Image lastInsideBounds = null;
+    [SerializeField] Sprite[] cursorSprites;
+    public string bodyPartName = "Brains";
+    [SerializeField] GameObject container;
+
+    [SerializeField] GameObject[] actorsTypesToSpawn;
+    [SerializeField] GameObject endGameStatus;
+    [SerializeField] GameObject endGameStatuslost;
+    int badBotCount;
+
+    int goodBotCount;
+
+    int initAmount = 12;
+
+
+    Sprite currentGameCursorSprite;
+    GameObject cursor;
+    UnityEngine.UI.Image cursorImage;
+    WindowManager instance;
+    Window _window;
+    private RectTransform CursorRectTransform;
+    private Vector2 canvasHalfSize;
+    bool inSideNewContainer;
+    bool gameEnded = false;
+    [SerializeField] float defaultCursorScale = 1;
+    [SerializeField] float inGameCursorScale = 0.3f;
+    [SerializeField] float minigameobjectScale = 0.7f;
+ 
+    public void _Init(Window window)
+    {
+        _window = window;
+        _window._name = "Destroy Corrupted Bots";
+        _window.SetWindowTitle("Destroy Corrupted", Color.white);
+
+        instance = WindowManager.instance;
+        cursor = instance.cursor;
+        cursorImage = cursor.GetComponent<UnityEngine.UI.Image>();
+        CursorRectTransform = cursor.GetComponent<RectTransform>();
+        GameCursor(1);
+     
+        UnityEngine.Cursor.visible = false;
+
+
+        createBot(true);
+        createBot(false);
+
+        for (int i = 0; i < initAmount; i++)
+        {
+            SpawnRandomActorsToMiniGame();
+
+        }
+    }
+
+
+    public void BeforeTermination()
+    {
+     
+        Destroy(this.gameObject, 0.1f);
+
+        UpdateCursorSpriteAndScale(0, 1);
+        //default cursor sprite
+        cursorImage.sprite = cursorSprites[0];
+        //default cursor scale
+        cursorImage.GetComponent<RectTransform>().localScale = new Vector2(1, 1);
+    }
+    public void GameCursor(int index)
+    {
+        currentGameCursorSprite = cursorSprites[index];
+        Invoke("GameCursorNormal", 0.2f);
+    }
+    void UpdateCursorSpriteAndScale(int spriteIndex, float scale)
+    {
+        //lastInsideBounds
+        if (spriteIndex == 0)//default main cursor
+        {
+            //print("Default cursor");
+            currentGameCursorSprite = cursorSprites[0];
+           
+            CursorRectTransform.localScale = new Vector2(scale, scale);
+        }
+        else    //ingame main cursor
+        {
+         
+            // print("game cursor");
+            currentGameCursorSprite = cursorSprites[spriteIndex];
+            CursorRectTransform.localScale = new Vector2(scale, scale);
+           
+        }
+        cursorImage.sprite = currentGameCursorSprite;
+    }
+    public void SetCursorByContainer(int index)
+    {
+        currentGameCursorSprite = cursorSprites[index];
+        //Invoke("GameCursorNormal", 0.2f);
+    }
+    public void GameCursorNormal()
+    {
+        currentGameCursorSprite = cursorSprites[1];
+
+    }
+    private void Update()
+    {
+
+        //bool inGame = _window.IsPositionInBounds(CursorRectTransform.anchoredPosition);
+        //UnityEngine.UI.Image currentlyInThisImage;
+
+        //if (gameEnded) inGame = false;
+
+
+        //if (inGame)    //is cursor inside the game window
+        //{
+        //   // print("Update inGame");
+        //    currentlyInThisImage = WhatImageContainerHasCursor();
+
+        //    // cursorImage.sprite = currentGameCursorSprite;
+
+        //    //  cursorImage.GetComponent<RectTransform>().localScale = new Vector2(0.3f, 0.3f);
+        //    CursorRectTransform.SetAsLastSibling();
+        //}
+        //else
+        //{
+        //   // print("Update ELSE");
+        //    lastInsideBounds = null;
+        //    cursorImage.sprite = cursorSprites[0];
+        //    cursorImage.GetComponent<RectTransform>().localScale = new Vector2(1, 1);
+
+        //}
+    }
+    UnityEngine.UI.Image WhatImageContainerHasCursor()
+    {
+        // print("h1");
+        int i = 0;
+        foreach (var image in windowImageBounds)
+        {
+            // print("h2: ");
+            bool inBound = IsPositionInBounds(Input.mousePosition, image);
+
+            if (inBound)
+            {
+                //print("h3: ");
+                if (lastInsideBounds == image)
+                {
+                    // print("h4 same container as last time: ");
+                    return image;
+                }
+                else
+                {
+                    // print("h4 new  container: ");
+
+                    //  print("image.name" + image.name);
+                    lastInsideBounds = image;
+                    inSideNewContainer = true;
+                    switch (image.name)
+                    {
+                        case "WINDOW_HANDLE_BAR":
+
+                            //print("h5 WINDOW_HANDLE_BAR: ");
+                            UpdateCursorSpriteAndScale(i, defaultCursorScale);
+                            break;
+                        case "windowBackground":
+                            //print("h5 windowBackground: ");
+                            UpdateCursorSpriteAndScale(i, inGameCursorScale);
+                            break;
+                        default:
+                            //  Debug.LogWarning("DIDN'T FIND this container: " + image.name);
+                            lastInsideBounds = null;
+                            //print("lastInsideBounds: " + lastInsideBounds);
+                            break;
+
+                    }
+
+                    return image;
+
+                }
+
+            }
+            // else cursorImage.sprite = cursorSprites[0];
+
+
+            i++;
+        }
+        return null;
+
+    }
+    void createBot(bool bad)
+    {
+        endGameStatus.SetActive(false);
+        endGameStatuslost.SetActive(false);
+        GameObject g;
+        if (bad)
+        {
+            g = Instantiate(actorsTypesToSpawn[3]);
+            //g = Instantiate(actorsTypesToSpawn[0]);
+            g.name = "BadBot";
+
+
+
+            badBotCount++;
+        }
+        else
+        {
+            g = Instantiate(actorsTypesToSpawn[4]);
+            //g = Instantiate(actorsTypesToSpawn[1]);
+            g.name = "GoodBot";
+
+            goodBotCount++;
+
+        }
+
+        g.transform.SetParent(container.transform);
+        g.GetComponent<RectTransform>().anchoredPosition = new Vector2(-100, UnityEngine.Random.Range(-100, 300));
+        MovementAndTargeting moveScript = g.GetComponent<MovementAndTargeting>();
+        moveScript.findBadNanoBots = this;
+
+        // g.GetComponent<RectTransform>().localScale = new Vector2(minigameobjectScale , minigameobjectScale);
+
+
+
+        initAmount++;
+    }
+
+    public void KilledObject(string objectName)
+    {
+
+        switch (objectName)
+        {
+            case "BadBot":
+                badBotCount--;
+                //print("______________  badBotCount - 1");
+                // print("hello BadBot");
+                break;
+            case "GoodBot":
+                goodBotCount--;
+                // print("______________  GoodBottCount - 1");
+                //print("hello GoodBot");
+                break;
+            case "Bacter":
+
+                break;
+            case "Bacter2":
+
+                break;
+            case "BloodCell":
+
+                break;
+        }
+
+        CheckIsGameOver();
+
+
+        // print("BadBotCount:" + badBotCount);
+
+        //  Debug.Log("goodBotCount:" + goodBotCount);
+
+    }
+    void CheckIsGameOver()
+    {
+        // print("______________  badBotCount:"+ badBotCount);
+        if (badBotCount <= 0)   //all corrupted bots removed
+        {
+            _window.SetWindowTitle("You Succeded", Color.green);
+
+            // Debug.Log("<color=red>GAME WON</color>");
+            //GAME done. ADD POINTS 
+            //patientManager.instance.OperationCompleted(true, bodyPartName);
+            endGameStatus.SetActive(true);
+            patientManager.instance.OperationCompleted(true, _window.customParams[0]);
+
+
+            gameEnded = true;
+            Invoke("closeWindow", 1);
+            // print("S______________  CheckIsGameOver");
+        }
+        if (badBotCount == initAmount || goodBotCount <= 0)    //game lost
+        {
+            _window.SetWindowTitle("You Failed", Color.red);
+            gameEnded = true;
+            //  Debug.Log("<color=red>GAME LOST</color>");
+
+            endGameStatuslost.SetActive(true);
+            patientManager.instance.OperationCompleted(false, _window.customParams[0]);
+            Invoke("closeWindow", 1);
+
+            // print("F______________  CheckIsGameOver");
+        }
+    }
+    void closeWindow()
+    {
+        //  Debug.Log("<color=red>close Window</color>");
+
+        WindowManager.instance.TerminateWindow(_window);
+
+    }
+    void SpawnRandomActorsToMiniGame()
+    {
+        int index = UnityEngine.Random.Range(0, actorsTypesToSpawn.Length);
+        GameObject g = Instantiate(actorsTypesToSpawn[index]);
+        g.transform.SetParent(container.transform);
+        g.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, UnityEngine.Random.Range(-100, 300));
+
+        MovementAndTargeting moveScript = g.GetComponent<MovementAndTargeting>();
+        moveScript.findBadNanoBots = this;
+
+
+
+        switch (index)
+        {
+            case 0: //Bacter
+                g.name = "Bacter";
+                //g.GetComponent<RectTransform>().localScale = new Vector2(minigameobjectScale, 0.3f);  
+                g.transform.SetAsFirstSibling();
+                break;
+            case 1: // Bacter2
+                g.name = "Bacter2";
+                //g.GetComponent<RectTransform>().localScale = new Vector2(minigameobjectScale, 0.4f);  
+                g.transform.SetAsFirstSibling();
+                break;
+            case 2: //BLOODCELL
+                g.name = "BloodCell";
+                //g.GetComponent<RectTransform>().localScale = new Vector2(minigameobjectScale, minigameobjectScale);  
+                g.transform.SetAsFirstSibling();
+                break;
+            case 3: //bad
+                g.name = "BadBot";
+                //g.GetComponent<RectTransform>().localScale = new Vector2(minigameobjectScale, minigameobjectScale);
+                badBotCount++;
+                break;
+            case 4: //good
+                g.name = "GoodBot";
+                //g.GetComponent<RectTransform>().localScale = new Vector2(minigameobjectScale, minigameobjectScale);
+                goodBotCount++;
+                break;
+        }
+
+    }
+
+
+
+    void CalculateCanvasSize()
+    {
+        Canvas canvas = GetComponentInParent<Canvas>();
+        RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+
+        canvasHalfSize = canvasRect.rect.size / 2 - new Vector2(840, 340);
+    }
+    bool CheckBoundaries()
+    {
+
+        CalculateCanvasSize();
+        Vector2 currentPos = CursorRectTransform.anchoredPosition;
+        bool outsideGameWindow = false;
+
+        if (Mathf.Abs(currentPos.x) > canvasHalfSize.x)
+        {
+            outsideGameWindow = true;
+        }
+
+        if (Mathf.Abs(currentPos.y) > canvasHalfSize.y)
+        {
+            outsideGameWindow = true;
+        }
+
+        return outsideGameWindow;
+    }
+
+    public bool IsPositionInBounds(Vector2 position, UnityEngine.UI.Image image)
+    {
+        //Vector2 toCursor = position;
+        //float xTreshold = image.rectTransform.sizeDelta.x / 2;
+        //float yTreshold = image.rectTransform.sizeDelta.y / 2;
+
+        //if (toCursor.x < xTreshold && toCursor.x > -xTreshold && toCursor.y < yTreshold && toCursor.y > -yTreshold)  //is
+        //{
+        //    return true;
+        //}
+        //else
+        //{
+        //    return false;
+        //}
+
+
+        // Convert the mouse position to the local space of the image (RectTransform)
+        Vector2 localPoint;
+        RectTransform rectT = image.rectTransform;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(rectT, position, null, out localPoint);
+
+        // Check if the local point is within the image's bounds
+        return rectT.rect.Contains(localPoint);
+    }
+    bool IsMouseInsideImage(Vector2 mousePos, UnityEngine.UI.Image image)
+    {
+        // Convert the mouse position to the local space of the image (RectTransform)
+        Vector2 localPoint;
+        RectTransform rectT = image.rectTransform;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(rectT, mousePos, null, out localPoint);
+
+        // Check if the local point is within the image's bounds
+        return rectT.rect.Contains(localPoint);
+    }
+}
+                </code> </pre>
+                </div>
+            </div>
+
+
+           
+
+            
+               
+               
+           
+            <div class="inner-box video-box">
+                <video class="video" controls autoplay loop muted playsinline>
+                    <source src="nanobotGameSuccess.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+               
+            
+            </div>
+        </div>
+    <!-- Object logic and movement -->
+    <div class="box">
+                
+        <h3>Object logic and movement</h3>
+        <div class="horizontal-container">
+            <div class="inner-box">
+                <div class="text-left">
+                   
+          
+                    
+                <pre><code class="language-csharp">
+    //object movement
+    public class MovementAndTargeting : MonoBehaviour, IWindow
+    {
+        public FindBadNanoBots findBadNanoBots;
+        [SerializeField] GameObject flashingObject;
+    
+        [Header("Movement Settings")]
+        [SerializeField] float moveSpeed = 45f;
+        [SerializeField] float detectionRange = 5f;
+        [SerializeField] float killDistance = 1;
+        [SerializeField] bool Tageting = true;
+    
+        public LayerMask targetLayer;
+        public string targetTag;
+    
+        private Vector2 randomDirection;
+        private Vector2 currentDirection;
+        private float changeDirectionTime = 2f; // Time interval to change random direction
+        private float nextDirectionChange;
+    
+        private GameObject target;
+    
+        [SerializeField] Sprite[] sprites; //Animation (Array of sprites to cycle through)
+        Image currentImage;
+        
+        private int currentIndex = 0;
+        private float nextChangeTime=1;
+        private float nextChangeTime2=1;
+        [SerializeField] Vector2 randomLightFlashTime = new Vector2(1.0f, 2.0f);
+        [SerializeField] float lightOnTime = 1.0f;
+        int indexImage = 0;
+        [SerializeField] int flastimes = 2;
+    
+        public float rotationOffset = -90f; // Adjust based on image's default orientation
+    
+        [SerializeField] float minigameobjectScale = 0.6f;
+    
+        private RectTransform thisRect;
+        private Vector2 moveDirection;
+        private Vector2 canvasHalfSize;
+        private Window _window;
+        RectTransform flashingObjectRect;
+        public WindowManager instance { get; private set; }
+        bool isDead = false;
+        float rotAngle;
+    
+        public void _Init(Window window)
+        {
+            _window = window;
+            instance = WindowManager.instance;
+                flashingObjectRect =  flashingObject.GetComponent<RectTransform>();
+        }
+    
+        public void BeforeTermination()
+        {
+    
+        }
+        void Start()
+        {
+            flashingObjectRect = flashingObject.GetComponent<RectTransform>();
+            thisRect = GetComponent<RectTransform>();
+            thisRect.localPosition = Vector3.zero;
+            ChangeDirection(); // initial random direction
+            currentImage = this.GetComponent<Image>();
+        
+            if (sprites.Length == 0)
+            {
+                //Debug.LogWarning("No sprites assigned to the sprites variable!");
+                return;
+            }
+    
+    
+            CalculateCanvasSize();
+            GetNewRandomDirection();
+        }
+    
+        void Update()
+        {
+    
+            if (!isDead)
+            {
+    
+    
+                if (Time.time >= nextChangeTime)
+                {
+    
+                    GetNewRandomDirection();
+                    float t = UnityEngine.Random.Range(1.0f, 2.5f);
+                    nextChangeTime = Time.time + t;
+    
+                }
+                if (Time.time >= nextChangeTime2)// light
+                {
+    
+                    StartCoroutine(ChangeSprite());
+                    float t = UnityEngine.Random.Range(randomLightFlashTime[0], randomLightFlashTime[1]);
+                    nextChangeTime2 = Time.time + t;
+    
+                }
+    
+    
+                MoveImage();
+                RotateTowardsDirection();
+                CheckBoundaries();
+            }
+        }
+    
+        void ChangeDirection()
+        {
+            // Choose a random direction
+            randomDirection = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f)).normalized;
+            nextDirectionChange = changeDirectionTime;
+            float angle = Mathf.Atan2(randomDirection.y, randomDirection.x) * Mathf.Rad2Deg;
+    
+        }
+    
+        void displayRectAnchoredPosition()
+        {
+            Vector2 s = thisRect.anchoredPosition;
+        
+        }
+    
+        void MoveTowardTarget()
+        {
+            if (target == null) return;
+    
+            // Move toward the target
+            currentDirection = (target.transform.position - transform.position).normalized;
+    
+            // Check if the object has reached the target
+            float distanceToTarget = Vector2.Distance(transform.position, target.transform.position);
+    
+            if (distanceToTarget < killDistance) // Reached the target
+            {
+                KillTarget();
+            }
+        }
+    
+        void KillTarget()
+        {
+            //Debug.Log("Target killed: " + target.name);
+            Destroy(target);
+            target = null;
+        }
+        IEnumerator ChangeSprite()
+        {
+            if (sprites.Length > 1)
+            {
+    
+                if (!isDead)
+                {
+        
+                    for (int i = 0; i < flastimes; i++)
+                    {
+                        if (!isDead)
+                        {
+                        currentImage.sprite = sprites[0];
+                        flashingObject.SetActive(true);
+    
+                        yield return new WaitForSeconds(lightOnTime);
+                        
+                        }
+                        if (!isDead)
+                        {
+                            flashingObject.SetActive(false);
+                            currentImage.sprite = sprites[1];
+                            yield return new WaitForSeconds(lightOnTime);
+    
+                        }
+    
+                    }
+                    
+                }
+            }
+            
+        }
+        private void OnDrawGizmosSelected()
+        {
+            // Draw detection range in the Scene view
+            Gizmos.color = UnityEngine.Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, detectionRange);
+            Gizmos.color = UnityEngine.Color.red;
+            Gizmos.DrawWireSphere(transform.position, killDistance);
+        }
+        public void DestroySelf()
+        {
+            
+            isDead = true;
+            flashingObject.SetActive(false);
+            currentImage.GetComponent<"Button">().enabled = false;
+            //Play dead animation
+            if (sprites.Length > 2)
+            {
+    
+                
+                StartCoroutine(PlayDeadAnimation());
+            }
+            findBadNanoBots.KilledObject(this.gameObject.name);
+            currentImage.name += "_Broken";
+    
+        }
+        IEnumerator PlayDeadAnimation()
+        {   //TODO: go through deadanimation sprites
+            
+            UnityEngine.Color color = currentImage.color;
+            float a = 1;
+            
+    
+            for (int i = 2; i < sprites.Length; i++)
+            {
+                currentImage.sprite = sprites[i];
+                currentImage.GetComponent<"RectTransform">().localScale = Vector3.one * minigameobjectScale * i;
+                if (i > 4)
+                {
+                    a -= 0.25f;
+                    UnityEngine.Color apha = new UnityEngine.Color(color.r, color.g, color.b, a);
+                    currentImage.color = apha;
+                }
+    
+                yield return new WaitForSeconds(0.1f);
+    
+            }
+            Destroy(this.gameObject);
+        }
+    
+        public void GameCursor(int cursorIndex)
+        {
+            findBadNanoBots.GameCursor(cursorIndex);
+        }
+    
+        void CalculateCanvasSize()
+        {
+            Canvas canvas = GetComponentInParent<"Canvas">();
+            RectTransform canvasRect = canvas.GetComponent<"RectTransform">();
+            canvasHalfSize = canvasRect.rect.size / 2 - new Vector2(850, 350);
+    
+        }
+    
+        void GetNewRandomDirection()
+        {
+            moveDirection = Random.insideUnitCircle.normalized;
+        }
+    
+        void MoveImage()
+        {
+            thisRect.anchoredPosition += moveDirection * moveSpeed * Time.deltaTime;
+        }
+    
+        void RotateTowardsDirection()
+        {
+            float angle = Mathf.Atan2(moveDirection.y, moveDirection.x) * Mathf.Rad2Deg + 90;
+            thisRect.localRotation = Quaternion.Euler(0, 0, angle + rotationOffset);
+            flashingObjectRect.localRotation = Quaternion.Euler(0, 0, -rotAngle+90);
+            rotAngle = angle;
+        }
+    
+        void CheckBoundaries()
+        {
+            Vector2 currentPos = thisRect.anchoredPosition;
+            bool needsBounce = false;
+            
+            if (Mathf.Abs(currentPos.x) > canvasHalfSize.x)
+            {
+                moveDirection.x *= -1;
+                needsBounce = true;
+            }
+    
+            if (Mathf.Abs(currentPos.y) > canvasHalfSize.y)
+            {
+                moveDirection.y *= -1;
+                needsBounce = true;
+            }
+    
+            if (needsBounce)
+            {
+                // Clamp position and immediately update rotation
+                currentPos.x = Mathf.Clamp(currentPos.x, -canvasHalfSize.x, canvasHalfSize.x);
+                currentPos.y = Mathf.Clamp(currentPos.y, -canvasHalfSize.y, canvasHalfSize.y);
+                thisRect.anchoredPosition = currentPos;
+                RotateTowardsDirection();
+            }
+        }
+    }
+                </code> </pre>
+                </div>
+            </div>
+
+
+           
+
+            
+               
+               
+           
+            <div class="inner-box video-box">
+                <video class="video" controls autoplay loop muted playsinline>
+                    <source src="nanobotGameSuccess.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+               
+            
+            </div>
+        </div>
+    </div>
+     
+    
+     <footer>
+         <p>&copy; 2025 Sauli Hanell. All rights reserved.</p>
+     </footer>
+</body>
+</html>
